@@ -2,21 +2,9 @@
 
 
 [[projects]]
-  branch = "master"
-  name = "code.cloudfoundry.org/clock"
-  packages = ["."]
-  revision = "e9dc86bbf0e5bbe6bf7ff5a6f71e048959b61f71"
-
-[[projects]]
   name = "github.com/Azure/go-ansiterm"
   packages = [".","winterm"]
   revision = "19f72df4d05d31cbe1c56bfc8045c96babff6c7e"
-
-[[projects]]
-  name = "github.com/Microsoft/ApplicationInsights-Go"
-  packages = ["appinsights"]
-  revision = "bac23a8f32e504d72bf361d9beef05b59fc478aa"
-  version = "v0.3.0"
 
 [[projects]]
   name = "github.com/Microsoft/go-winio"
@@ -56,6 +44,12 @@
   packages = ["."]
   revision = "0dadbb0345b35ec7ef35e228dabb8de89a65bf52"
   version = "v0.3.2"
+
+[[projects]]
+  name = "github.com/fatih/structs"
+  packages = ["."]
+  revision = "a720dfa8df582c51dee1b36feabb906bde1588bd"
+  version = "v1.0"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -113,6 +107,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "81b860d650f81b83d38c677f3960207f3f8d9e1ff63ac32b11527ad91319f292"
+  inputs-digest = "22bda0f52812e2326faa3025db191822fa5e68b2cbf31cb9219c05b0f1e37cc5"
   solver-name = "gps-cdcl"
   solver-version = 1

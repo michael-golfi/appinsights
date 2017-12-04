@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/daemon/logger"
+	"github.com/fatih/structs"
 )
 
 const (
@@ -28,30 +29,25 @@ type data struct {
 }
 
 type messageData struct {
-	Version       int               `json:"ver"`
-	Properties    map[string]string `json:"properties"`
-	Message       string            `json:"message"`
-	SeverityLevel int               `json:"severityLevel"`
+	Version       int                    `json:"ver"`
+	Properties    map[string]interface{} `json:"properties"`
+	Message       string                 `json:"message"`
+	SeverityLevel int                    `json:"severityLevel"`
 }
 
 func (l *insightsLogger) createInsightsMessage(msg *logger.Message) *envelope {
 	message := *l.nullMessage
 	message.Time = time.Now().UTC().Format(time.RFC3339)
-	//fmt.Printf("The time is now: %s", message.Time)
 
-	props := make(map[string]string)
-	for _, attr := range msg.Attrs {
-		props[attr.Key] = attr.Value
-	}
+	ctx := structs.Map(l.logCtx)
 
-	props["source"] = msg.Source
 	message.Data = data{
 		BaseType: "MessageData",
 		BaseData: messageData{
 			Version:       2,
 			Message:       string(msg.Line),
 			SeverityLevel: verbose,
-			Properties:    props,
+			Properties:    ctx,
 		},
 	}
 	return &message
