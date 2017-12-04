@@ -18,7 +18,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/tonistiigi/fifo"
-	"gitlab.com/michael.golfi/appinsights/insightslib"
+	"gitlab.com/michael.golfi/appinsights/insights"
 )
 
 type driver struct {
@@ -64,7 +64,7 @@ func (d *driver) StartLogging(file string, logCtx logger.Info) error {
 		return errors.Wrap(err, "error creating jsonfile logger")
 	}
 
-	sl, err := insightslib.New(logCtx)
+	sl, err := insights.New(logCtx)
 	if err != nil {
 		return errors.Wrap(err, "error creating splunk logger")
 	}
