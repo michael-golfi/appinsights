@@ -67,6 +67,8 @@ type insightsLogger struct {
 	lock       sync.RWMutex
 	closed     bool
 	closedCond *sync.Cond
+
+	logCtx logger.Info
 }
 
 func init() {
@@ -148,6 +150,8 @@ func New(info logger.Info) (logger.Logger, error) {
 		postMessagesFrequency: postMessagesFrequency,
 		postMessagesBatchSize: postMessagesBatchSize,
 		bufferMaximum:         bufferMaximum,
+
+		logCtx: info,
 	}
 
 	// By default we verify connection, but we allow use to skip that
