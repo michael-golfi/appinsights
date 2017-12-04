@@ -36,7 +36,8 @@ type messageData struct {
 
 func (l *insightsLogger) createInsightsMessage(msg *logger.Message) *envelope {
 	message := *l.nullMessage
-	message.Time = msg.Timestamp.Format(time.RFC3339)
+	message.Time = time.Now().UTC().Format(time.RFC3339)
+	//fmt.Printf("The time is now: %s", message.Time)
 
 	props := make(map[string]string)
 	for _, attr := range msg.Attrs {

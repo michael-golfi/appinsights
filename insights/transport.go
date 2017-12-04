@@ -32,7 +32,7 @@ func parseURL(info logger.Info) (*url.URL, error) {
 		(insightsURL.Path != "" && insightsURL.Path != "/") ||
 		insightsURL.RawQuery != "" ||
 		insightsURL.Fragment != "" {
-		return nil, fmt.Errorf("%s: expected format scheme://dns_name_or_ip:port for %s", insightsDriverName, insightsURLKey)
+		return nil, fmt.Errorf("%s: expected format scheme://dns_name_or_ip:port for %s, received: %s", insightsDriverName, insightsURLKey, insightsURLStr)
 	}
 
 	insightsURL.Path = "/v2/track"
