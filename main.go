@@ -6,6 +6,7 @@ import (
 
 	"github.com/docker/go-plugins-helpers/sdk"
 	"github.com/sirupsen/logrus"
+	"gitlab.com/michael.golfi/appinsights/handler"
 )
 
 var logLevels = map[string]logrus.Level{
@@ -28,8 +29,8 @@ func main() {
 	}
 
 	h := sdk.NewHandler(`{"Implements": ["LoggingDriver"]}`)
-	handlers(&h, newDriver())
-	if err := h.ServeUnix("multilogger", 0); err != nil {
+	handler.Handle(&h, handler.NewDriver())
+	if err := h.ServeUnix("appinsights", 0); err != nil {
 		panic(err)
 	}
 }

@@ -1,49 +1,57 @@
 package insights
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/docker/docker/daemon/logger"
 )
 
-type telemetry struct {
-	Time         string
-	Properties   map[string]string
-	Context      map[string]string
-	TagOverrides map[string]string
+const (
+	verbose = 0
+	//Info = 1
+	//Debug = 1
+	//Error = 2
+	critical = 4
+)
+
+type envelope struct {
+	Name string            `json:"name"`
+	Time string            `json:"time"`
+	Ikey string            `json:"iKey"`
+	Tags map[string]string `json:"tags"`
+	Data data              `json:"data"`
 }
 
-type metricTelemetry struct {
-	telemetry
-	Name   string
-	Value  string
-	Count  int
-	Min    int
-	Max    int
-	StdDev int
+type data struct {
+	BaseType string      `json:"baseType"`
+	BaseData messageData `json:"baseData"`
 }
 
-type traceTelemetry struct {
-	telemetry
-
-	// Keep for now...
-	Hostname string
-
-	Message  string
-	Severity string
+type messageData struct {
+	Version       int               `json:"ver"`
+	Properties    map[string]string `json:"properties"`
+	Message       string            `json:"message"`
+	SeverityLevel int               `json:"severityLevel"`
 }
 
-func (d *metricTelemetry) String() string {
-	return ""
-}
-
-func (d *traceTelemetry) String() string {
-	return ""
-}
-
-func (l *insightsLogger) createInsightsMessage(msg *logger.Message) *traceTelemetry {
+func (l *insightsLogger) createInsightsMessage(msg *logger.Message) *envelope {
 	message := *l.nullMessage
-	message.Time = fmt.Sprintf("%f", float64(msg.Timestamp.UnixNano())/float64(time.Second))
+	message.Time = msg.Timestamp.Format(time.RFC3339)
+
+	props := make(map[string]string)
+	for _, attr := range msg.Attrs {
+		props[attr.Key] = attr.Value
+	}
+
+	props["source"] = msg.Source
+	message.Data = data{
+		BaseType: "MessageData",
+		BaseData: messageData{
+			Version:       2,
+			Message:       string(msg.Line),
+			SeverityLevel: verbose,
+			Properties:    props,
+		},
+	}
 	return &message
 }

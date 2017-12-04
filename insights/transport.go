@@ -35,8 +35,7 @@ func parseURL(info logger.Info) (*url.URL, error) {
 		return nil, fmt.Errorf("%s: expected format scheme://dns_name_or_ip:port for %s", insightsDriverName, insightsURLKey)
 	}
 
-	// REVIEW
-	//	insightsURL.Path = "/services/collector/event/1.0"
+	insightsURL.Path = "/v2/track"
 
 	return insightsURL, nil
 }
@@ -65,7 +64,7 @@ func verifyInsightsConnection(l *insightsLogger) error {
 }
 
 // REVIEW
-func (l *insightsLogger) queueMessageAsync(message *traceTelemetry) error {
+func (l *insightsLogger) queueMessageAsync(message *envelope) error {
 	l.lock.RLock()
 	defer l.lock.RUnlock()
 	if l.closedCond != nil {
@@ -76,7 +75,7 @@ func (l *insightsLogger) queueMessageAsync(message *traceTelemetry) error {
 }
 
 // REVIEW
-func (l *insightsLogger) postMessages(messages []*traceTelemetry, lastChance bool) []*traceTelemetry {
+func (l *insightsLogger) postMessages(messages []*envelope, lastChance bool) []*envelope {
 	messagesLen := len(messages)
 
 	ctx, cancel := context.WithTimeout(context.Background(), batchSendTimeout)
@@ -115,7 +114,7 @@ func (l *insightsLogger) postMessages(messages []*traceTelemetry, lastChance boo
 }
 
 // REVIEW
-func (l *insightsLogger) tryPostMessages(ctx context.Context, messages []*traceTelemetry) error {
+func (l *insightsLogger) tryPostMessages(ctx context.Context, messages []*envelope) error {
 	if len(messages) == 0 {
 		return nil
 	}
@@ -155,7 +154,7 @@ func (l *insightsLogger) tryPostMessages(ctx context.Context, messages []*traceT
 		return err
 	}
 	req = req.WithContext(ctx)
-	req.Header.Set("Authorization", l.auth)
+	//req.Header.Set("Authorization", l.auth)
 	// Tell if we are sending gzip compressed body
 	if l.gzipCompression {
 		req.Header.Set("Content-Encoding", "gzip")

@@ -10,8 +10,8 @@ docker rm -vf "$id"
 docker rmi rootfsimage
 cp config.json ./plugin/
 
-docker plugin disable ekristen/multilogger
-docker plugin rm ekristen/multilogger
-docker plugin create ekristen/multilogger ./plugin
+docker plugin disable michael-golfi/appinsights
+docker plugin rm michael-golfi/appinsights
+docker plugin create michael-golfi/appinsights ./plugin
 
 rm -rf ./plugin

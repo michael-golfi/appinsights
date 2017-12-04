@@ -22,17 +22,12 @@ After installation you can reference `ekristen/multilogger` as your logging driv
 
 ```bash
 docker run -d --name "example-logger" \
-  --log-driver ekristen/multilogger
-  --log-opt max-file=2 \
-  --log-opt max-size=10m \
-  --log-opt splunk-url=https://localhost:8088 \
-  --log-opt splunk-token=00000000-0000-0000-0000-000000000000 \
-  --log-opt splunk-insecureskipverify=true \
-  --log-opt splunk-source=my-source \
-  --log-opt splunk-sourcetype=testing \
-  --log-opt splunk-format=raw \
-  --log-opt tag="" \
+  --log-driver michael-golfi/appinsights
+  --log-opt splunk-url=https://dc.visualstudio.com \
+  --log-opt splunk-token=b11d730f-995c-4eda-ac8a-79093fcace6d \
   ubuntu bash -c 'while true; do echo "{\"msg\": \"something\", \"time\": \"`date +%s`\"}"; sleep 2; done;'
+
+
 ```
 
 ## Supported Drivers

@@ -7,7 +7,7 @@ import (
 
 func (l *insightsLogger) worker() {
 	timer := time.NewTicker(l.postMessagesFrequency)
-	var messages []*traceTelemetry
+	var messages []*envelope
 	for {
 		select {
 		case message, open := <-l.stream:

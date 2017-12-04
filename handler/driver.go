@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"context"
@@ -14,11 +14,11 @@ import (
 	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/docker/docker/daemon/logger"
 	"github.com/docker/docker/daemon/logger/jsonfilelog"
-	"github.com/docker/docker/daemon/logger/splunk"
 	protoio "github.com/gogo/protobuf/io"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/tonistiigi/fifo"
+	"gitlab.com/michael.golfi/appinsights/insightslib"
 )
 
 type driver struct {
@@ -35,7 +35,7 @@ type logPair struct {
 	info   logger.Info
 }
 
-func newDriver() *driver {
+func NewDriver() *driver {
 	return &driver{
 		logs: make(map[string]*logPair),
 		idx:  make(map[string]*logPair),
@@ -64,7 +64,7 @@ func (d *driver) StartLogging(file string, logCtx logger.Info) error {
 		return errors.Wrap(err, "error creating jsonfile logger")
 	}
 
-	sl, err := splunk.New(logCtx)
+	sl, err := insightslib.New(logCtx)
 	if err != nil {
 		return errors.Wrap(err, "error creating splunk logger")
 	}

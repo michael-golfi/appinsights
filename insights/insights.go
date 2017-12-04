@@ -47,7 +47,7 @@ type insightsLogger struct {
 
 	url                string
 	instrumentationKey string
-	nullMessage        *traceTelemetry
+	nullMessage        *envelope
 	// TODO - Support more message types than only trace
 	//nullTrace   *insightsMessage
 
@@ -63,7 +63,7 @@ type insightsLogger struct {
 	// For synchronization between background worker and logger.
 	// We use channel to send messages to worker go routine.
 	// All other variables for blocking Close call before we flush all messages to HEC
-	stream     chan *traceTelemetry
+	stream     chan *envelope
 	lock       sync.RWMutex
 	closed     bool
 	closedCond *sync.Cond
@@ -80,10 +80,10 @@ func init() {
 
 // New creates splunk logger driver using configuration passed in context
 func New(info logger.Info) (logger.Logger, error) {
-	hostname, err := info.Hostname()
+	/*hostname, err := info.Hostname()
 	if err != nil {
 		return nil, fmt.Errorf("%s: cannot access hostname to set source field", insightsDriverName)
-	}
+	}*/
 
 	// Parse and validate URL
 	insightsURL, err := parseURL(info)
@@ -124,8 +124,9 @@ func New(info logger.Info) (logger.Logger, error) {
 		},
 	}
 
-	nullMessage := &traceTelemetry{
-		Hostname: hostname,
+	nullMessage := &envelope{
+		Name: fmt.Sprintf("Microsoft.ApplicationInsights.MessageData", insightsToken),
+		Ikey: insightsToken,
 	}
 
 	var (
@@ -143,7 +144,7 @@ func New(info logger.Info) (logger.Logger, error) {
 		nullMessage:           nullMessage,
 		gzipCompression:       gzipCompression,
 		gzipCompressionLevel:  gzipCompressionLevel,
-		stream:                make(chan *traceTelemetry, streamChannelSize),
+		stream:                make(chan *envelope, streamChannelSize),
 		postMessagesFrequency: postMessagesFrequency,
 		postMessagesBatchSize: postMessagesBatchSize,
 		bufferMaximum:         bufferMaximum,
