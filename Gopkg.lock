@@ -63,6 +63,12 @@
   revision = "7b6c6391c4ff245962047fc1e2c6e08b1cdfa0e8"
 
 [[projects]]
+  name = "github.com/inconshreveable/mousetrap"
+  packages = ["."]
+  revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
+  version = "v1.0"
+
+[[projects]]
   name = "github.com/opencontainers/go-digest"
   packages = ["."]
   revision = "279bed98673dd5bef374d3b6e4b09e2af76183bf"
@@ -82,6 +88,18 @@
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   revision = "259b4b7f450a330ee03d88f0d704c2cc7964cf9e"
+
+[[projects]]
+  name = "github.com/spf13/cobra"
+  packages = ["."]
+  revision = "7b2c5ac9fc04fc5efafb60700713d4fa609b777b"
+  version = "v0.0.1"
+
+[[projects]]
+  name = "github.com/spf13/pflag"
+  packages = ["."]
+  revision = "e57e3eeb33f795204c1ca35f56c44f83227c6e66"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -107,6 +125,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "22bda0f52812e2326faa3025db191822fa5e68b2cbf31cb9219c05b0f1e37cc5"
+  inputs-digest = "30671572599e961f9af95a76ac4833b7067ccf2162882205476b527647d10001"
   solver-name = "gps-cdcl"
   solver-version = 1

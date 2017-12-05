@@ -82,11 +82,6 @@ func init() {
 
 // New creates splunk logger driver using configuration passed in context
 func New(info logger.Info) (logger.Logger, error) {
-	/*hostname, err := info.Hostname()
-	if err != nil {
-		return nil, fmt.Errorf("%s: cannot access hostname to set source field", insightsDriverName)
-	}*/
-
 	// Parse and validate URL
 	insightsURL, err := parseURL(info)
 	if err != nil {
