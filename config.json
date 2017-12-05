@@ -1,7 +1,7 @@
 {
 	"description": "Container logging for Application Insights",
 	"documentation": "-",
-	"entrypoint": ["/usr/bin/appinsights"],
+	"entrypoint": ["/usr/bin/appinsights", "serve"],
 	"interface": {
 		"types": ["docker.logdriver/1.0"],
 		"socket": "appinsights.sock"
@@ -14,18 +14,6 @@
 			"name": "LOG_LEVEL",
 			"description": "Set log level to output for plugin logs",
 			"value": "info",
-			"settable": ["value"]
-		},
-		{
-			"name": "insights-url",
-			"description": "Set URL endpoint for logging",
-			"value": "https://dc.services.visualstudio.com",
-			"settable": ["value"]
-		},
-		{
-			"name": "insights-key",
-			"description": "Set Instrumentation Key for logging",
-			"value": "b11d730f-995c-4eda-ac8a-79093fcace6d",
 			"settable": ["value"]
 		}
 	]
