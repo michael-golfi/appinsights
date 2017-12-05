@@ -1,4 +1,4 @@
-// Copyright © 2017 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2017 Michael Golfi <michael.golfi@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -51,36 +49,9 @@ func Execute() {
 }
 
 func init() {
-	//cobra.OnInitialize(initConfig)
-	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.appinsights.yaml)")
-
 	rootCmd.PersistentFlags().StringVarP(&insightsURL, "url", "", "https://dc.services.visualstudio.com", "The URL for App Insights")
 	rootCmd.PersistentFlags().StringVarP(&insightsToken, "key", "k", "", "Insights Instrumentation Key")
 	rootCmd.PersistentFlags().StringVarP(&insightsInsecureSkipVerify, "insecure-skip-verify", "", "false", "Skip verifying the SSL certificate")
 	rootCmd.PersistentFlags().StringVarP(&insightsGzipCompression, "compress", "c", "false", "Enable GZip compression")
 	rootCmd.PersistentFlags().StringVarP(&insightsVerifyConnection, "verify-connection", "", "false", "Verify the connection to App Insights on start")
-}
-
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		// Search config in home directory with name ".newcmd" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".appinsights")
-	}
-
-	viper.AutomaticEnv()
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
 }

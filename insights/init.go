@@ -16,8 +16,10 @@ func ValidateLogOpt(cfg map[string]string) error {
 	for key := range cfg {
 		switch key {
 		case insightsURLKey:
+		case insightsTokenKey:
 		case insightsInsecureSkipVerifyKey:
 		case insightsGzipCompressionKey:
+		case insightsVerifyConnectionKey:
 		default:
 			return fmt.Errorf("unknown log opt '%s' for %s log driver", key, insightsDriverName)
 		}

@@ -1,0 +1,90 @@
+image: 'registry.gitlab.com/pantomath-io/demo-tools:latest'
+
+cache:
+  paths:
+    #- /apt-cache
+    - /go/src/github.com
+    - /go/src/golang.org
+    - /go/src/google.golang.org
+    - /go/src/gopkg.in
+
+variables:
+  # Please edit to your GitLab project
+  REPO_NAME: gitlab.com/michael.golfi/appinsights
+  CC: clang-5.0
+
+
+stages:
+  - build
+  - test
+  - deploy
+
+before_script:
+  - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
+  - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
+  - cd $GOPATH/src/$REPO_NAME
+
+Build:
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - vendor/*
+      - $CI_PROJECT_NAME
+    untracked: true
+  script:
+    - make install
+    # Check if it compiles without errors
+    - CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo --ldflags="-s" -o $CI_PROJECT_NAME
+  stage: build
+
+Lint:
+  stage: test
+  # Syntax warnings come out as errors
+  allow_failure: true
+  script:
+    - make lint
+
+Test:
+  stage: test
+  script:
+    - make test
+
+Race:
+  stage: test
+  script:
+    - make race
+
+Memory Sanitize:
+  stage: test
+  script:
+    - make msan
+
+Coverage:
+  stage: test
+  script:
+    - make coverage
+
+Deploy:
+  image: 'docker:latest'
+  stage: deploy
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:${CI_BUILD_REF:0:5} -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:${CI_BUILD_REF:0:5}
+  services:
+    - 'docker:dind'
+  except:
+    - tags
+
+Deploy Tag:
+  image: 'docker:latest'
+  stage: deploy
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+  services:
+    - 'docker:dind'
+  only:
+    - tags
+  
