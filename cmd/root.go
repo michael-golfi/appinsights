@@ -23,7 +23,15 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	level                      string
+	cfgFile                    string
+	insightsURL                string
+	insightsToken              string
+	insightsInsecureSkipVerify string
+	insightsGzipCompression    string
+	insightsVerifyConnection   string
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -45,6 +53,12 @@ func Execute() {
 func init() {
 	//cobra.OnInitialize(initConfig)
 	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.appinsights.yaml)")
+
+	rootCmd.PersistentFlags().StringVarP(&insightsURL, "url", "", "https://dc.services.visualstudio.com", "The URL for App Insights")
+	rootCmd.PersistentFlags().StringVarP(&insightsToken, "key", "k", "", "Insights Instrumentation Key")
+	rootCmd.PersistentFlags().StringVarP(&insightsInsecureSkipVerify, "insecure-skip-verify", "", "false", "Skip verifying the SSL certificate")
+	rootCmd.PersistentFlags().StringVarP(&insightsGzipCompression, "compress", "c", "false", "Enable GZip compression")
+	rootCmd.PersistentFlags().StringVarP(&insightsVerifyConnection, "verify-connection", "", "false", "Verify the connection to App Insights on start")
 }
 
 // initConfig reads in config file and ENV variables if set.

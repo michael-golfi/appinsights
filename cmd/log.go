@@ -1,4 +1,4 @@
-// Copyright © 2017 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2017 Michael Golfi <michael.golfi@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -75,17 +75,17 @@ func sendMessage(client logger.Logger, line string) {
 
 func createLoggerInfo() logger.Info {
 	config := make(map[string]string)
-	config["insights-url"] = "https://dc.services.visualstudio.com"
+	config["insights-url"] = insightsURL
 	config["insights-key"] = insightsToken
+	config["insights-insecureskipverify"] = insightsInsecureSkipVerify
+	config["insights-gzip"] = insightsGzipCompression
+	config["insights-verify-connection"] = insightsVerifyConnection
+
 	return logger.Info{
 		Config: config,
 	}
 }
 
-var insightsToken string
-
 func init() {
 	rootCmd.AddCommand(logCmd)
-	logCmd.Flags().StringVarP(&insightsToken, "token", "t", "", "Insights Instrumentation Key")
-
 }
