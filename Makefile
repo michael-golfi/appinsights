@@ -37,18 +37,19 @@ msan: #dep ## Run memory sanitizer
 	CGO_ENABLED=1 GOOS=linux go test -msan -short ${PKG_LIST}
 
 coverage: ## Generate global code coverage report
-	@chmod +x tools/coverage.sh
-	GOOS=linux ./tools/coverage.sh;
+	@chmod +x scripts/coverage.sh
+	GOOS=linux ./scripts/coverage.sh;
 
 coverhtml: ## Generate global code coverage report in HTML
-	GOOS=linux ./tools/coverage.sh html;
+	@chmod +x scripts/coverage.sh
+	GOOS=linux ./scripts/coverage.sh html;
 
 #
 # Deploy
 #
 deploy:
 	./scripts/build.sh
-	#@docker plugin push $(IMAGE_NAME):$(TAG)
+	@docker plugin push $(IMAGE_NAME):$(TAG)
 
 #
 # Help and Teardown
