@@ -24,7 +24,6 @@ import (
 	"gitlab.com/michael.golfi/appinsights/handler"
 )
 
-var level string
 var logLevels = map[string]logrus.Level{
 	"debug": logrus.DebugLevel,
 	"info":  logrus.InfoLevel,
