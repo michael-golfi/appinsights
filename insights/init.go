@@ -58,6 +58,7 @@ func getInsecureSkipVerify(info logger.Info) (bool, error) {
 	if insecureSkipVerifyStr, ok := info.Config[insightsInsecureSkipVerifyKey]; ok {
 		insecureSkipVerify, err := strconv.ParseBool(insecureSkipVerifyStr)
 		if err != nil {
+			logrus.Error(fmt.Sprintf("Failed to parse value of insecureSkipVerify as boolean. %v", err))
 			return false, err
 		}
 		return insecureSkipVerify, nil
@@ -78,14 +79,15 @@ func getGzipCompression(info logger.Info) (bool, error) {
 
 func getGzipCompressionLevel(info logger.Info) (int, error) {
 	gzipCompressionLevel := gzip.DefaultCompression
-	if gzipCompressionLevelStr, ok := info.Config[insightsGzipCompressionKey]; ok {
+	if gzipCompressionLevelStr, ok := info.Config[insightsGzipCompressionLevelKey]; ok {
 		gzipCompressionLevel64, err := strconv.ParseInt(gzipCompressionLevelStr, 10, 32)
 		if err != nil {
+			logrus.Error(fmt.Sprintf("Failed to parse value of gzipCompressionLevel as integer. %v", err))
 			return gzip.DefaultCompression, err
 		}
 		gzipCompressionLevel = int(gzipCompressionLevel64)
 		if gzipCompressionLevel < gzip.DefaultCompression || gzipCompressionLevel > gzip.BestCompression {
-			err := fmt.Errorf("not supported level '%s' for %s (supported values between %d and %d)", gzipCompressionLevelStr, insightsGzipCompressionKey, gzip.DefaultCompression, gzip.BestCompression)
+			err := fmt.Errorf("not supported level '%s' for %s (supported values between %d and %d)", gzipCompressionLevelStr, insightsGzipCompressionLevelKey, gzip.DefaultCompression, gzip.BestCompression)
 			return gzip.DefaultCompression, err
 		}
 	}
