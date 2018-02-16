@@ -1,17 +1,3 @@
-// Copyright © 2017 Michael Golfi <michael.golfi@gmail.com>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package cmd
 
 import (
@@ -21,6 +7,7 @@ import (
 	"os"
 
 	"github.com/docker/docker/daemon/logger"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gitlab.com/michael.golfi/appinsights/insights"
 )
@@ -34,6 +21,7 @@ Use this command to test connectivity.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := insights.New(createLoggerInfo())
 		if err != nil {
+			logrus.Error(fmt.Sprintf("Failed to create logging client. %v", err))
 			panic(err)
 		}
 
@@ -79,6 +67,7 @@ func createLoggerInfo() logger.Info {
 	config["insights-key"] = insightsToken
 	config["insights-insecureskipverify"] = insightsInsecureSkipVerify
 	config["insights-gzip"] = insightsGzipCompression
+	config["insights-gzip-level"] = insightsGzipCompressionLevel
 	config["insights-verify-connection"] = insightsVerifyConnection
 
 	return logger.Info{

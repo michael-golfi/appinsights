@@ -13,12 +13,13 @@ import (
 )
 
 const (
-	insightsDriverName            = "insights"
-	insightsURLKey                = "insights-url"
-	insightsTokenKey              = "insights-key"
-	insightsInsecureSkipVerifyKey = "insights-insecureskipverify"
-	insightsGzipCompressionKey    = "insights-gzip"
-	insightsVerifyConnectionKey   = "insights-verify-connection"
+	insightsDriverName              = "insights"
+	insightsURLKey                  = "insights-url"
+	insightsTokenKey                = "insights-key"
+	insightsInsecureSkipVerifyKey   = "insights-insecureskipverify"
+	insightsGzipCompressionKey      = "insights-gzip"
+	insightsGzipCompressionLevelKey = "insights-gzip-level"
+	insightsVerifyConnectionKey     = "insights-verify-connection"
 )
 
 const (
