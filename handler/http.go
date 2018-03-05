@@ -11,28 +11,28 @@ import (
 	"github.com/docker/go-plugins-helpers/sdk"
 )
 
-type StartLoggingRequest struct {
+type startLoggingRequest struct {
 	File string
 	Info logger.Info
 }
 
-type StopLoggingRequest struct {
+type stopLoggingRequest struct {
 	File string
 }
 
-type CapabilitiesResponse struct {
+type capabilitiesResponse struct {
 	Err string
 	Cap logger.Capability
 }
 
-type ReadLogsRequest struct {
+type readLogsRequest struct {
 	Info   logger.Info
 	Config logger.ReadConfig
 }
 
-func Handle(h *sdk.Handler, d *driver) {
+func Handle(h *sdk.Handler, d *Driver) {
 	h.HandleFunc("/LogDriver.StartLogging", func(w http.ResponseWriter, r *http.Request) {
-		var req StartLoggingRequest
+		var req startLoggingRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -47,7 +47,7 @@ func Handle(h *sdk.Handler, d *driver) {
 	})
 
 	h.HandleFunc("/LogDriver.StopLogging", func(w http.ResponseWriter, r *http.Request) {
-		var req StopLoggingRequest
+		var req stopLoggingRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -57,13 +57,13 @@ func Handle(h *sdk.Handler, d *driver) {
 	})
 
 	h.HandleFunc("/LogDriver.Capabilities", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(&CapabilitiesResponse{
+		json.NewEncoder(w).Encode(&capabilitiesResponse{
 			Cap: logger.Capability{ReadLogs: true},
 		})
 	})
 
 	h.HandleFunc("/LogDriver.ReadLogs", func(w http.ResponseWriter, r *http.Request) {
-		var req ReadLogsRequest
+		var req readLogsRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

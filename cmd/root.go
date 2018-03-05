@@ -8,8 +8,11 @@ import (
 )
 
 var (
-	level                        string
-	cfgFile                      string
+	// Administrative configuration
+	level   string
+	cfgFile string
+
+	// Application Insights Configuration
 	insightsURL                  string
 	insightsToken                string
 	insightsInsecureSkipVerify   string
@@ -28,6 +31,7 @@ The plugin supports the docker log command and also supports buffering and retry
 for remote App Insights in the case of network disconnection`,
 }
 
+// Execute is the entrypoint to the command execution context.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

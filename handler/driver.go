@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"sync"
 	"syscall"
 	"time"
 
@@ -21,34 +20,32 @@ import (
 	"gitlab.com/michael.golfi/appinsights/insights"
 )
 
-type driver struct {
-	mu     sync.Mutex
-	logs   map[string]*logPair
-	idx    map[string]*logPair
+// Driver maintains a mutex for synchronizing map access for tracking logpairs and maintains the logging interface for each container
+type Driver struct {
+	logs   *logPairMap
+	idx    *logPairMap
 	logger logger.Logger
 }
 
 type logPair struct {
-	l      logger.Logger
+	fileLog      logger.Logger
 	stream io.ReadCloser
-	sl     logger.Logger
+	aiLog     logger.Logger
 	info   logger.Info
 }
 
-func NewDriver() *driver {
-	return &driver{
-		logs: make(map[string]*logPair),
-		idx:  make(map[string]*logPair),
+// NewDriver creates a driver which initializes the logpairs for each container
+func NewDriver() *Driver {
+	return &Driver{
+		logs: newLogPairMap(),
+		idx: newLogPairMap(),
 	}
 }
 
-func (d *driver) StartLogging(file string, logCtx logger.Info) error {
-	d.mu.Lock()
-	if _, exists := d.logs[file]; exists {
-		d.mu.Unlock()
+func (d *Driver) StartLogging(file string, logCtx logger.Info) error {
+	if _, exists := d.logs.Load(file); exists {
 		return fmt.Errorf("logger for %q already exists", file)
 	}
-	d.mu.Unlock()
 
 	logCtx.Config["tag"] = ""
 
@@ -75,25 +72,22 @@ func (d *driver) StartLogging(file string, logCtx logger.Info) error {
 		return errors.Wrapf(err, "error opening logger fifo: %q", file)
 	}
 
-	d.mu.Lock()
 	lf := &logPair{l, f, sl, logCtx}
-	d.logs[file] = lf
-	d.idx[logCtx.ContainerID] = lf
-	d.mu.Unlock()
-
+	d.logs.Store(file, lf)
+	d.idx.Store(logCtx.ContainerID, lf)
 	go consumeLog(lf)
 	return nil
 }
 
-func (d *driver) StopLogging(file string) error {
+func (d *Driver) StopLogging(file string) error {
 	logrus.WithField("file", file).Debugf("Stop logging")
-	d.mu.Lock()
-	lf, ok := d.logs[file]
-	if ok {
-		lf.stream.Close()
-		delete(d.logs, file)
+	if lf, ok := d.logs.Load(file); ok {
+		if err := lf.stream.Close(); err != nil {
+			logrus.WithField("file", file).Errorf("Could not stop logging: %s", file)
+			return err
+		}
+		d.logs.Delete(file)
 	}
-	d.mu.Unlock()
 	return nil
 }
 
@@ -117,16 +111,12 @@ func consumeLog(lf *logPair) {
 		msg.Partial = buf.Partial
 		msg.Timestamp = time.Unix(0, buf.TimeNano)
 
-		if err := lf.l.Log(&msg); err != nil {
+		if err := lf.fileLog.Log(&msg); err != nil {
 			logrus.WithField("id", lf.info.ContainerID).WithError(err).WithField("message", msg).Error("error writing log message")
 			continue
 		}
 
-		var smsg logger.Message
-		smsg.Line = buf.Line
-		smsg.Source = buf.Source
-
-		if err := lf.sl.Log(&smsg); err != nil {
+		if err := lf.aiLog.Log(&msg); err != nil {
 			logrus.WithField("id", lf.info.ContainerID).WithError(err).WithField("message", msg).Error("error writing log message")
 			continue
 		}
@@ -135,16 +125,14 @@ func consumeLog(lf *logPair) {
 	}
 }
 
-func (d *driver) ReadLogs(info logger.Info, config logger.ReadConfig) (io.ReadCloser, error) {
-	d.mu.Lock()
-	lf, exists := d.idx[info.ContainerID]
-	d.mu.Unlock()
+func (d *Driver) ReadLogs(info logger.Info, config logger.ReadConfig) (io.ReadCloser, error) {
+	lf, exists := d.idx.Load(info.ContainerID)
 	if !exists {
 		return nil, fmt.Errorf("logger does not exist for %s", info.ContainerID)
 	}
 
 	r, w := io.Pipe()
-	lr, ok := lf.l.(logger.LogReader)
+	lr, ok := lf.fileLog.(logger.LogReader)
 	if !ok {
 		return nil, fmt.Errorf("logger does not support reading")
 	}
