@@ -88,7 +88,7 @@ func (l *insightsLogger) postMessages(messages []*envelope, lastChance bool) []*
 		}
 
 		if err := l.tryPostMessages(ctx, messages[i:upperBound]); err != nil {
-			logrus.WithError(err).WithField("module", "logger/splunk").Warn("Error while sending logs")
+			logrus.WithError(err).WithField("module", "logger/appinsights").Warn("Error while sending logs")
 			if messagesLen-i >= l.bufferMaximum || lastChance {
 				// If this is last chance - print them all to the daemon log
 				if lastChance {
@@ -154,7 +154,6 @@ func (l *insightsLogger) tryPostMessages(ctx context.Context, messages []*envelo
 		return err
 	}
 	req = req.WithContext(ctx)
-	//req.Header.Set("Authorization", l.auth)
 	// Tell if we are sending gzip compressed body
 	if l.gzipCompression {
 		req.Header.Set("Content-Encoding", "gzip")

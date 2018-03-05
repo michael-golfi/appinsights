@@ -81,7 +81,7 @@ func init() {
 	}
 }
 
-// New creates splunk logger driver using configuration passed in context
+// New creates appinsights logger driver using configuration passed in context
 func New(info logger.Info) (logger.Logger, error) {
 	// Parse and validate URL
 	insightsURL, err := parseURL(info)

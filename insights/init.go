@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// ValidateLogOpt looks for all supported by splunk driver options
+// ValidateLogOpt looks for all supported by appinsights driver options
 func ValidateLogOpt(cfg map[string]string) error {
 	for key := range cfg {
 		switch key {

@@ -66,7 +66,7 @@ func (d *driver) StartLogging(file string, logCtx logger.Info) error {
 
 	sl, err := insights.New(logCtx)
 	if err != nil {
-		return errors.Wrap(err, "error creating splunk logger")
+		return errors.Wrap(err, "error creating appinsights logger")
 	}
 
 	logrus.WithField("id", logCtx.ContainerID).WithField("file", file).WithField("logpath", logCtx.LogPath).Debugf("Start logging")
