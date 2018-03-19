@@ -10,42 +10,37 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-
-	"github.com/docker/docker/daemon/logger"
 	"github.com/docker/docker/pkg/urlutil"
 	"github.com/sirupsen/logrus"
+
+	ai "github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
+	"gitlab.com/michael.golfi/appinsights/constants"
 )
 
-func parseURL(info logger.Info) (*url.URL, error) {
-	insightsURLStr, ok := info.Config[insightsURLKey]
-	if !ok {
-		return nil, fmt.Errorf("%s: %s is expected", insightsDriverName, insightsURLKey)
+func parseURL(endpoint string) (*url.URL, error) {
+	if !urlutil.IsURL(endpoint) {
+		return nil, fmt.Errorf("expected endpoint format https://dns_name_or_ip:port, received: %s", endpoint)
 	}
 
-	insightsURL, err := url.Parse(insightsURLStr)
+	insightsURL, err := url.Parse(endpoint)
 	if err != nil {
-		return nil, fmt.Errorf("%s: failed to parse %s as url value in %s", insightsDriverName, insightsURLStr, insightsURLKey)
+		return nil, fmt.Errorf("%s: failed to parse %s as url value in %s", constants.DriverName, endpoint, constants.EndpointKey)
 	}
 
-	if !urlutil.IsURL(insightsURLStr) ||
-		!insightsURL.IsAbs() ||
-		(insightsURL.Path != "" && insightsURL.Path != "/") ||
-		insightsURL.RawQuery != "" ||
-		insightsURL.Fragment != "" {
-		return nil, fmt.Errorf("%s: expected format scheme://dns_name_or_ip:port for %s, received: %s", insightsDriverName, insightsURLKey, insightsURLStr)
+	if !insightsURL.IsAbs() || insightsURL.Path == "" || insightsURL.Path == "/" || insightsURL.RawQuery != "" || insightsURL.Fragment != "" {
+		return nil, fmt.Errorf("expected endpoint format scheme://dns_name_or_ip:port, received: %s", endpoint)
 	}
-
-	insightsURL.Path = "/v2/track"
 
 	return insightsURL, nil
 }
 
-func verifyInsightsConnection(l *insightsLogger) error {
-	req, err := http.NewRequest(http.MethodOptions, l.url, nil)
+func verifyInsightsConnection(uri string) error {
+	client := http.Client{}
+	req, err := http.NewRequest(http.MethodOptions, uri, nil)
 	if err != nil {
 		return err
 	}
-	res, err := l.client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
 		return err
 	}
@@ -58,27 +53,27 @@ func verifyInsightsConnection(l *insightsLogger) error {
 		if err != nil {
 			return err
 		}
-		return fmt.Errorf("%s: failed to verify connection - %s - %s", insightsDriverName, res.Status, body)
+		return fmt.Errorf("%s: failed to verify connection - %s - %s", constants.DriverName, res.Status, body)
 	}
 	return nil
 }
 
 // REVIEW
-func (l *insightsLogger) queueMessageAsync(message *envelope) error {
+func (l *insightsLogger) queueMessageAsync(message *ai.Envelope) error {
 	l.lock.RLock()
 	defer l.lock.RUnlock()
 	if l.closedCond != nil {
-		return fmt.Errorf("%s: driver is closed", insightsDriverName)
+		return fmt.Errorf("%s: driver is closed", constants.DriverName)
 	}
 	l.stream <- message
 	return nil
 }
 
 // REVIEW
-func (l *insightsLogger) postMessages(messages []*envelope, lastChance bool) []*envelope {
+func (l *insightsLogger) postMessages(messages []*ai.Envelope, lastChance bool) []*ai.Envelope {
 	messagesLen := len(messages)
 
-	ctx, cancel := context.WithTimeout(context.Background(), batchSendTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), l.sendTimeout)
 	defer cancel()
 
 	for i := 0; i < messagesLen; i += l.postMessagesBatchSize {
@@ -100,7 +95,7 @@ func (l *insightsLogger) postMessages(messages []*envelope, lastChance bool) []*
 					if jsonEvent, err := json.Marshal(messages[j]); err != nil {
 						logrus.Error(err)
 					} else {
-						logrus.Error(fmt.Errorf("Failed to send a message '%s'", string(jsonEvent)))
+						logrus.Error(fmt.Errorf("ailed to send a message '%s'", string(jsonEvent)))
 					}
 				}
 				return messages[upperBound:messagesLen]
@@ -114,7 +109,7 @@ func (l *insightsLogger) postMessages(messages []*envelope, lastChance bool) []*
 }
 
 // REVIEW
-func (l *insightsLogger) tryPostMessages(ctx context.Context, messages []*envelope) error {
+func (l *insightsLogger) tryPostMessages(ctx context.Context, messages []*ai.Envelope) error {
 	if len(messages) == 0 {
 		return nil
 	}
@@ -169,7 +164,7 @@ func (l *insightsLogger) tryPostMessages(ctx context.Context, messages []*envelo
 		if err != nil {
 			return err
 		}
-		return fmt.Errorf("%s: failed to send event - %s - %s", insightsDriverName, res.Status, body)
+		return fmt.Errorf("%s: failed to send event - %s - %s", constants.DriverName, res.Status, body)
 	}
 	io.Copy(ioutil.Discard, res.Body)
 	return nil
