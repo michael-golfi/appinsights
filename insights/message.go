@@ -4,51 +4,74 @@ import (
 	"time"
 
 	"github.com/docker/docker/daemon/logger"
-	"github.com/fatih/structs"
+	ai "github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
+	"encoding/json"
+	"log"
 )
 
-const (
-	verbose = 0
-	//Info = 1
-	//Debug = 1
-	//Error = 2
-	critical = 4
-)
+func (l *insightsLogger) createInsightsMessage(msg *logger.Message) *ai.Envelope {
+	ctx, err := mapLogCtx(l.logCtx)
+	if err != nil {
+		log.Println(err)
+	}
 
-type envelope struct {
-	Name string            `json:"name"`
-	Time string            `json:"time"`
-	Ikey string            `json:"iKey"`
-	Tags map[string]string `json:"tags"`
-	Data data              `json:"data"`
-}
+	ctx["Source"] = msg.Source
+	for _, attr := range msg.Attrs {
+		ctx[attr.Key] = attr.Value
+	}
 
-type data struct {
-	BaseType string      `json:"baseType"`
-	BaseData messageData `json:"baseData"`
-}
-
-type messageData struct {
-	Version       int                    `json:"ver"`
-	Properties    map[string]interface{} `json:"properties"`
-	Message       string                 `json:"message"`
-	SeverityLevel int                    `json:"severityLevel"`
-}
-
-func (l *insightsLogger) createInsightsMessage(msg *logger.Message) *envelope {
-	message := *l.nullMessage
-	message.Time = time.Now().UTC().Format(time.RFC3339)
-
-	ctx := structs.Map(l.logCtx)
-
-	message.Data = data{
-		BaseType: "MessageData",
-		BaseData: messageData{
-			Version:       2,
-			Message:       string(msg.Line),
-			SeverityLevel: verbose,
-			Properties:    ctx,
+	return &ai.Envelope{
+		Name: "Microsoft.ApplicationInsights.MessageData",
+		IKey: l.instrumentationKey,
+		Time: time.Now().UTC().Format(time.RFC3339),
+		Data: ai.Data{
+			Base: ai.Base{
+				BaseType: "MessageData",
+			},
+			BaseData: ai.MessageData{
+				Ver:           2,
+				Message:       string(msg.Line),
+				SeverityLevel: ai.Verbose,
+				Properties:    ctx,
+			},
 		},
 	}
-	return &message
+}
+
+func mapLogCtx(logCtx logger.Info) (map[string]string, error) {
+	out := make(map[string]string, 5)
+	out["ContainerID"] = logCtx.ContainerID
+	out["ContainerName"] = logCtx.ContainerName
+	out["ContainerEntrypoint"] = logCtx.ContainerEntrypoint
+	out["ContainerImageID"] = logCtx.ContainerImageID
+	out["ContainerImageName"] = logCtx.ContainerImageName
+	out["LogPath"] = logCtx.LogPath
+	out["DaemonName"] = logCtx.DaemonName
+	out["ContainerCreated"] = logCtx.ContainerCreated.Format(time.RFC3339)
+
+	args, err := json.Marshal(logCtx.ContainerArgs)
+	if err != nil {
+		return nil, err
+	}
+
+	env, err := json.Marshal(logCtx.ContainerEnv)
+	if err != nil {
+		return nil, err
+	}
+
+	conf, err := json.Marshal(logCtx.Config)
+	if err != nil {
+		return nil, err
+	}
+
+	labels, err := json.Marshal(logCtx.ContainerLabels)
+	if err != nil {
+		return nil, err
+	}
+
+	out["ContainerArgs"] = string(args)
+	out["ContainerEnv"] = string(env)
+	out["Config"] = string(conf)
+	out["ContainerLabels"] = string(labels)
+	return out, nil
 }

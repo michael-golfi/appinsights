@@ -2,15 +2,25 @@
 
 
 [[projects]]
+  branch = "master"
   name = "github.com/Azure/go-ansiterm"
-  packages = [".","winterm"]
-  revision = "19f72df4d05d31cbe1c56bfc8045c96babff6c7e"
+  packages = [
+    ".",
+    "winterm"
+  ]
+  revision = "d6e3b3328b783f23731bc4d058875b0371ff8109"
+
+[[projects]]
+  name = "github.com/Microsoft/ApplicationInsights-Go"
+  packages = ["appinsights/contracts"]
+  revision = "3612f58550c1de70f1a110c78c830e55f29aa65d"
+  version = "v0.4"
 
 [[projects]]
   name = "github.com/Microsoft/go-winio"
   packages = ["."]
-  revision = "7ff89941bcb93df2e962467fb073c6e997b13cf0"
-  version = "v0.4.4"
+  revision = "7da180ee92d8bd8bb8c37fc560e673e6557c392f"
+  version = "v0.4.7"
 
 [[projects]]
   branch = "master"
@@ -19,25 +29,80 @@
   revision = "cd527374f1e5bff4938207604a14f2e38a9cf512"
 
 [[projects]]
-  name = "github.com/coreos/go-systemd"
-  packages = ["activation"]
-  revision = "24036eb3df68550d24a2736c5d013f4e83366866"
+  branch = "master"
+  name = "github.com/containerd/fifo"
+  packages = ["."]
+  revision = "3d5202aec260678c48179c56f40e6f38a095738c"
 
 [[projects]]
+  name = "github.com/coreos/go-systemd"
+  packages = ["activation"]
+  revision = "40e2722dffead74698ca12a750f64ef313ddce05"
+  version = "v16"
+
+[[projects]]
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
+  version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
   name = "github.com/docker/docker"
-  packages = ["api/types","api/types/backend","api/types/blkiodev","api/types/container","api/types/filters","api/types/mount","api/types/network","api/types/plugins/logdriver","api/types/registry","api/types/strslice","api/types/swarm","api/types/swarm/runtime","api/types/versions","daemon/logger","daemon/logger/jsonfilelog","daemon/logger/jsonfilelog/jsonlog","daemon/logger/jsonfilelog/multireader","daemon/logger/loggerutils","daemon/logger/templates","pkg/filenotify","pkg/ioutils","pkg/jsonmessage","pkg/longpath","pkg/plugingetter","pkg/plugins","pkg/plugins/transport","pkg/progress","pkg/pubsub","pkg/streamformatter","pkg/stringid","pkg/tailfile","pkg/term","pkg/term/windows","pkg/urlutil"]
-  revision = "786311be7d011960801d713f0d01ea9d36f63170"
+  packages = [
+    "api/types",
+    "api/types/backend",
+    "api/types/blkiodev",
+    "api/types/container",
+    "api/types/filters",
+    "api/types/mount",
+    "api/types/network",
+    "api/types/plugins/logdriver",
+    "api/types/registry",
+    "api/types/strslice",
+    "api/types/swarm",
+    "api/types/swarm/runtime",
+    "api/types/versions",
+    "daemon/logger",
+    "daemon/logger/jsonfilelog",
+    "daemon/logger/jsonfilelog/jsonlog",
+    "daemon/logger/loggerutils",
+    "daemon/logger/loggerutils/multireader",
+    "daemon/logger/templates",
+    "pkg/filenotify",
+    "pkg/ioutils",
+    "pkg/jsonmessage",
+    "pkg/longpath",
+    "pkg/plugingetter",
+    "pkg/plugins",
+    "pkg/plugins/transport",
+    "pkg/pools",
+    "pkg/progress",
+    "pkg/pubsub",
+    "pkg/streamformatter",
+    "pkg/stringid",
+    "pkg/tailfile",
+    "pkg/term",
+    "pkg/term/windows",
+    "pkg/urlutil"
+  ]
+  revision = "0c1006f1abc1af7aa6b9847754370d054dfa6c68"
 
 [[projects]]
   name = "github.com/docker/go-connections"
-  packages = ["nat","sockets","tlsconfig"]
+  packages = [
+    "nat",
+    "sockets",
+    "tlsconfig"
+  ]
   revision = "3ede32e2033de7505e6500d6c868c2b9ed9f169d"
   version = "v0.3.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/docker/go-plugins-helpers"
   packages = ["sdk"]
-  revision = "96217206cc52dcc41d4ace9a9bef8c6111f2e5f9"
+  revision = "61cb8e2334204460162c8bd2417cd43cb71da66f"
 
 [[projects]]
   name = "github.com/docker/go-units"
@@ -46,21 +111,19 @@
   version = "v0.3.2"
 
 [[projects]]
-  name = "github.com/fatih/structs"
-  packages = ["."]
-  revision = "a720dfa8df582c51dee1b36feabb906bde1588bd"
-  version = "v1.0"
-
-[[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
-  revision = "629574ca2a5df945712d3079857300b5e4da0236"
-  version = "v1.4.2"
+  revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
+  version = "v1.4.7"
 
 [[projects]]
   name = "github.com/gogo/protobuf"
-  packages = ["io","proto"]
-  revision = "7b6c6391c4ff245962047fc1e2c6e08b1cdfa0e8"
+  packages = [
+    "io",
+    "proto"
+  ]
+  revision = "1adfc126b41513cc696b209667c8656ea7aac67c"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -76,18 +139,30 @@
 
 [[projects]]
   name = "github.com/opencontainers/image-spec"
-  packages = ["specs-go","specs-go/v1"]
-  revision = "ef2b9a1d696677abd664a0879758d2b115b1ded3"
+  packages = [
+    "specs-go",
+    "specs-go/v1"
+  ]
+  revision = "d60099175f88c47cd379c4738d158884749ed235"
+  version = "v1.0.1"
 
 [[projects]]
   name = "github.com/pkg/errors"
   packages = ["."]
-  revision = "c605e284fe17294bda444b34710735b29d1a9d90"
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "259b4b7f450a330ee03d88f0d704c2cc7964cf9e"
+  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
+  version = "v1.0.5"
 
 [[projects]]
   name = "github.com/spf13/cobra"
@@ -102,29 +177,53 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/stretchr/testify"
+  packages = [
+    "assert",
+    "require"
+  ]
+  revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
+  version = "v1.2.1"
+
+[[projects]]
   branch = "master"
   name = "github.com/tonistiigi/fifo"
   packages = ["."]
-  revision = "fbfb6a11ec671efbe94ad1c12c2e98773f19e1e6"
+  revision = "3d5202aec260678c48179c56f40e6f38a095738c"
 
 [[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  revision = "c3a3ad6d03f7a915c0f7e194b7152974bb73d287"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/net"
-  packages = ["context","proxy"]
-  revision = "f5079bd7f6f74e23c4d65efa0f4ce14cbd6a3c0f"
+  packages = [
+    "context",
+    "proxy"
+  ]
+  revision = "6078986fec03a1dcc236c34816c71b0e05018fda"
 
 [[projects]]
+  branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
-  revision = "35ef4487ce0a1ea5d4b616ffe71e34febe723695"
+  packages = [
+    "unix",
+    "windows"
+  ]
+  revision = "d8e400bc7db4870d786864138af681469693d18c"
 
 [[projects]]
+  branch = "master"
   name = "golang.org/x/time"
   packages = ["rate"]
-  revision = "8be79e1e0910c292df4e79c241bb7e8f7e725959"
+  revision = "26559e0f760e39c24d730d3224364aef164ee23f"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "76e47f2b9fbc7f1b34bf26fb7b0e568759ee04a9ef6b5d7dda54a9ecd22f5840"
+  inputs-digest = "cd13836747111edfafe90a3dbf5467eddefecb438b198be49e9bf8dbbfa551ae"
   solver-name = "gps-cdcl"
   solver-version = 1

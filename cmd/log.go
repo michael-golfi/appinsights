@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gitlab.com/michael.golfi/appinsights/insights"
+	"gitlab.com/michael.golfi/appinsights/constants"
 )
 
 // logCmd represents the log command
@@ -62,13 +63,15 @@ func sendMessage(client logger.Logger, line string) {
 }
 
 func createLoggerInfo() logger.Info {
-	config := make(map[string]string)
-	config["insights-url"] = insightsURL
-	config["insights-key"] = insightsToken
-	config["insights-insecureskipverify"] = insightsInsecureSkipVerify
-	config["insights-gzip"] = insightsGzipCompression
-	config["insights-gzip-level"] = insightsGzipCompressionLevel
-	config["insights-verify-connection"] = insightsVerifyConnection
+	config := make(map[string]string, 8)
+	config[constants.EndpointKey] = constants.Endpoint
+	config[constants.TokenKey] = constants.Token
+	config[constants.InsecureSkipVerifyKey] = constants.InsecureSkipVerifyStr
+	config[constants.GzipCompressionKey] = constants.GzipCompressionStr
+	config[constants.GzipCompressionLevelKey] = constants.GzipCompressionLevelStr
+	config[constants.VerifyConnectionKey] = constants.VerifyConnectionStr
+	config[constants.BatchSizeKey] = constants.BatchSizeStr
+	config[constants.BatchIntervalKey] = constants.BatchIntervalStr
 
 	return logger.Info{
 		Config: config,

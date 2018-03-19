@@ -3,21 +3,24 @@ package insights
 import (
 	"sync"
 	"time"
+	ai "github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
 )
 
 func (l *insightsLogger) worker() {
 	timer := time.NewTicker(l.postMessagesFrequency)
-	var messages []*envelope
+	var messages []*ai.Envelope
 	for {
 		select {
 		case message, open := <-l.stream:
 			if !open {
 				l.postMessages(messages, true)
 				l.lock.Lock()
-				defer l.lock.Unlock()
+
 				l.transport.CloseIdleConnections()
 				l.closed = true
 				l.closedCond.Signal()
+
+				l.lock.Unlock()
 				return
 			}
 			messages = append(messages, message)

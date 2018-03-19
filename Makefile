@@ -15,7 +15,7 @@ all: build
 #
 install: ## Get the dependencies
 	@go get -u github.com/golang/dep/cmd/dep
-	@dep ensure
+	@dep ensure --vendor-only
 	@go get -u github.com/golang/lint/golint
 
 build: #dep ## Build the binary file

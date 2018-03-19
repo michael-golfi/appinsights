@@ -5,20 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-)
-
-var (
-	// Administrative configuration
-	level   string
-	cfgFile string
-
-	// Application Insights Configuration
-	insightsURL                  string
-	insightsToken                string
-	insightsInsecureSkipVerify   string
-	insightsGzipCompression      string
-	insightsGzipCompressionLevel string
-	insightsVerifyConnection     string
+	"gitlab.com/michael.golfi/appinsights/constants"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -40,10 +27,12 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&insightsURL, "url", "", "https://dc.services.visualstudio.com", "The URL for App Insights")
-	rootCmd.PersistentFlags().StringVarP(&insightsToken, "key", "k", "", "Insights Instrumentation Key")
-	rootCmd.PersistentFlags().StringVarP(&insightsInsecureSkipVerify, "insecure-skip-verify", "", "false", "Skip verifying the SSL certificate")
-	rootCmd.PersistentFlags().StringVarP(&insightsGzipCompression, "compress", "c", "false", "Enable GZip compression")
-	rootCmd.PersistentFlags().StringVarP(&insightsGzipCompressionLevel, "compress-level", "", "0", "GZip compression level")
-	rootCmd.PersistentFlags().StringVarP(&insightsVerifyConnection, "verify-connection", "", "false", "Verify the connection to App Insights on start")
+	rootCmd.PersistentFlags().StringVarP(&constants.Endpoint, constants.EndpointKey, "", constants.Endpoint, "The URL for App Insights")
+	rootCmd.PersistentFlags().StringVarP(&constants.Token, constants.TokenKey, "k", constants.Token, "Insights Instrumentation Key")
+	rootCmd.PersistentFlags().StringVarP(&constants.InsecureSkipVerifyStr, constants.InsecureSkipVerifyKey, "", constants.InsecureSkipVerifyStr, "Skip verifying the SSL certificate")
+	rootCmd.PersistentFlags().StringVarP(&constants.GzipCompressionStr, constants.GzipCompressionKey, "c", constants.GzipCompressionStr, "Enable GZip compression")
+	rootCmd.PersistentFlags().StringVarP(&constants.GzipCompressionLevelStr, constants.GzipCompressionLevelKey, "", constants.GzipCompressionLevelStr, "GZip compression level")
+	rootCmd.PersistentFlags().StringVarP(&constants.VerifyConnectionStr, constants.VerifyConnectionKey, "", constants.VerifyConnectionStr, "Verify the connection to App Insights on start")
+	rootCmd.PersistentFlags().StringVarP(&constants.BatchSizeStr, constants.BatchSizeKey, "", constants.BatchSizeStr, "Message Batch Size")
+	rootCmd.PersistentFlags().StringVarP(&constants.BatchIntervalStr, constants.BatchIntervalKey, "", constants.BatchIntervalStr, "Message Batch Interval")
 }
