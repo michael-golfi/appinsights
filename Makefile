@@ -51,6 +51,7 @@ plugin:
 	./scripts/plugin.sh
 
 deploy: plugin
+	./scripts/build.sh
 	@docker plugin push $(IMAGE_NAME):$(TAG)
 
 #

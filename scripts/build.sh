@@ -1,4 +1,6 @@
 #!/bin/bash
+rm -rf plugin
+
 docker build -t rootfsimage .
 id=$(docker create rootfsimage true)
 mkdir -p plugin/rootfs
@@ -11,3 +13,5 @@ cp config.json ./plugin/
 docker plugin disable michaelgolfi/appinsights
 docker plugin rm michaelgolfi/appinsights
 docker plugin create michaelgolfi/appinsights ./plugin
+
+rm -rf plugin
