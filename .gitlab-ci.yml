@@ -68,9 +68,13 @@ Deploy:
   image: 'docker:latest'
   stage: deploy
   script:
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE:${CI_BUILD_REF:0:5} -t $CI_REGISTRY_IMAGE:latest .
-    - docker push $CI_REGISTRY_IMAGE:${CI_BUILD_REF:0:5}
+    - make plugin
+    - docker login -u $USERNAME -p $PASSWORD
+
+    - docker plugin create michaelgolfi/appinsights:${CI_BUILD_REF:0:5} ./plugin
+    - docker plugin create michaelgolfi/appinsights:latest ./plugin
+    - docker plugin push michaelgolfi/appinsights:${CI_BUILD_REF:0:5}
+    - docker plugin push michaelgolfi/appinsights:latest
   services:
     - 'docker:dind'
   except:
@@ -80,11 +84,14 @@ Deploy Tag:
   image: 'docker:latest'
   stage: deploy
   script:
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG -t $CI_REGISTRY_IMAGE:latest .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+    - make plugin
+    - docker login -u $USERNAME -p $PASSWORD
+
+    - docker plugin create michaelgolfi/appinsights:$CI_COMMIT_TAG ./plugin
+    - docker plugin create michaelgolfi/appinsights:latest ./plugin
+    - docker plugin push michaelgolfi/appinsights:$CI_COMMIT_TAG
+    - docker plugin push michaelgolfi/appinsights:latest
   services:
     - 'docker:dind'
   only:
-    - tags
-  
+    - tags  
