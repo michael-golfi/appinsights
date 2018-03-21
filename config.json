@@ -1,7 +1,7 @@
 {
 	"description": "Container logging for Application Insights",
 	"documentation": "-",
-	"entrypoint": ["/usr/bin/appinsights", "serve"],
+	"entrypoint": ["/bin/appinsights", "serve"],
 	"interface": {
 		"types": ["docker.logdriver/1.0"],
 		"socket": "appinsights.sock"

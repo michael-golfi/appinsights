@@ -1,5 +1,5 @@
 PROJECT_NAME := "appinsights"
-IMAGE_NAME := "michael.golfi/appinsights"
+IMAGE_NAME := "michaelgolfi/appinsights"
 PKG := "gitlab.com/michael.golfi/appinsights"
 TAG ?= "latest"
 
@@ -19,7 +19,7 @@ install: ## Get the dependencies
 	@go get -u github.com/golang/lint/golint
 
 build: #dep ## Build the binary file
-	GOOS=linux go build -i -v $(PKG)
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo --ldflags="-s" -o appinsights
 
 #
 # Test
@@ -47,8 +47,10 @@ coverhtml: ## Generate global code coverage report in HTML
 #
 # Deploy
 #
-deploy:
-	./scripts/build.sh
+plugin:
+	./scripts/plugin.sh
+
+deploy: plugin
 	@docker plugin push $(IMAGE_NAME):$(TAG)
 
 #
