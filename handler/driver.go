@@ -28,17 +28,17 @@ type Driver struct {
 }
 
 type logPair struct {
-	fileLog      logger.Logger
-	stream io.ReadCloser
-	aiLog     logger.Logger
-	info   logger.Info
+	fileLog logger.Logger
+	stream  io.ReadCloser
+	aiLog   logger.Logger
+	info    logger.Info
 }
 
 // NewDriver creates a driver which initializes the logpairs for each container
 func NewDriver() *Driver {
 	return &Driver{
 		logs: newLogPairMap(),
-		idx: newLogPairMap(),
+		idx:  newLogPairMap(),
 	}
 }
 
@@ -46,8 +46,6 @@ func (d *Driver) StartLogging(file string, logCtx logger.Info) error {
 	if _, exists := d.logs.Load(file); exists {
 		return fmt.Errorf("logger for %q already exists", file)
 	}
-
-	logCtx.Config["tag"] = ""
 
 	if logCtx.LogPath == "" {
 		logCtx.LogPath = filepath.Join("/var/log/docker", logCtx.ContainerID)
