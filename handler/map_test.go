@@ -6,7 +6,7 @@ import (
 )
 
 func TestLogPairMap(t *testing.T) {
-	lm := logPairMap{}
+	lm := newLogPairMap()
 	lm.Store("Hello", &logPair{})
 	val, ok := lm.Load("Hello")
 
