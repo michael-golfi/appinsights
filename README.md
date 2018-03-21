@@ -30,9 +30,9 @@ docker run -d --name "example-logger" \
 | token                |                                                 |
 | verify-connection    | "true"                                          |
 | insecure-skip-verify | "false"                                         |
-| gzip                 | "true"                                          |
+| gzip                 | "false"                                         |
 | gzip-level           | "0"                                             |
-| batch-size           | "1000"                                          |
+| batch-size           | "1024"                                          |
 | batch-interval       | "5s"                                            |
 
 ## Building
