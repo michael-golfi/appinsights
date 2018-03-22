@@ -45,6 +45,7 @@ func NewDriver() *Driver {
 	}
 }
 
+// StartLogging initializes the logging endpoints for log stream, file and application insights
 func (d *Driver) StartLogging(file string, logCtx logger.Info) error {
 	if _, exists := d.logs.Load(file); exists {
 		return fmt.Errorf("logger for %q already exists", file)
@@ -80,6 +81,7 @@ func (d *Driver) StartLogging(file string, logCtx logger.Info) error {
 	return nil
 }
 
+// StopLogging will unregister all the handles to files and application insights
 func (d *Driver) StopLogging(file string) error {
 	logrus.WithField("file", file).Debugf("Stop logging")
 
@@ -154,6 +156,7 @@ func (d *Driver) consumeLog(file string, lf *logPair) {
 	}
 }
 
+// ReadLogs reads from the log stream for the docker logs command
 func (d *Driver) ReadLogs(info logger.Info, config logger.ReadConfig) (io.ReadCloser, error) {
 	lf, exists := d.idx.Load(info.ContainerID)
 	if !exists {
