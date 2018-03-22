@@ -30,6 +30,7 @@ type readLogsRequest struct {
 	Config logger.ReadConfig
 }
 
+// Handle initializes all the socket endpoints for the Docker daemon and the driver
 func Handle(h *sdk.Handler, d *Driver) {
 	h.HandleFunc("/LogDriver.StartLogging", func(w http.ResponseWriter, r *http.Request) {
 		var req startLoggingRequest
