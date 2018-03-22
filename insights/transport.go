@@ -10,10 +10,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	"github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
 	"github.com/docker/docker/pkg/urlutil"
 	"github.com/sirupsen/logrus"
 
-	ai "github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
 	"gitlab.com/michael.golfi/appinsights/constants"
 )
 
@@ -59,7 +60,7 @@ func verifyInsightsConnection(uri string) error {
 }
 
 // REVIEW
-func (l *insightsLogger) queueMessageAsync(message *ai.Envelope) error {
+func (l *insightsLogger) queueMessageAsync(message *contracts.Envelope) error {
 	l.lock.RLock()
 	defer l.lock.RUnlock()
 	if l.closedCond != nil {
@@ -70,7 +71,7 @@ func (l *insightsLogger) queueMessageAsync(message *ai.Envelope) error {
 }
 
 // REVIEW
-func (l *insightsLogger) postMessages(messages []*ai.Envelope, lastChance bool) []*ai.Envelope {
+func (l *insightsLogger) postMessages(messages []*contracts.Envelope, lastChance bool) []*contracts.Envelope {
 	messagesLen := len(messages)
 
 	ctx, cancel := context.WithTimeout(context.Background(), l.sendTimeout)
@@ -95,7 +96,7 @@ func (l *insightsLogger) postMessages(messages []*ai.Envelope, lastChance bool) 
 					if jsonEvent, err := json.Marshal(messages[j]); err != nil {
 						logrus.Error(err)
 					} else {
-						logrus.Error(fmt.Errorf("ailed to send a message '%s'", string(jsonEvent)))
+						logrus.Error(fmt.Errorf("failed to send a message '%s'", string(jsonEvent)))
 					}
 				}
 				return messages[upperBound:messagesLen]
@@ -109,7 +110,7 @@ func (l *insightsLogger) postMessages(messages []*ai.Envelope, lastChance bool) 
 }
 
 // REVIEW
-func (l *insightsLogger) tryPostMessages(ctx context.Context, messages []*ai.Envelope) error {
+func (l *insightsLogger) tryPostMessages(ctx context.Context, messages []*contracts.Envelope) error {
 	if len(messages) == 0 {
 		return nil
 	}

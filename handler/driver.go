@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sync"
 	"syscall"
 	"time"
 
@@ -28,10 +29,12 @@ type Driver struct {
 }
 
 type logPair struct {
-	fileLog logger.Logger
-	stream  io.ReadCloser
-	aiLog   logger.Logger
-	info    logger.Info
+	isOpen     bool
+	closedCond sync.RWMutex
+	fileLog    logger.Logger
+	stream     io.ReadCloser
+	aiLog      logger.Logger
+	info       logger.Info
 }
 
 // NewDriver creates a driver which initializes the logpairs for each container
@@ -70,26 +73,40 @@ func (d *Driver) StartLogging(file string, logCtx logger.Info) error {
 		return errors.Wrapf(err, "error opening logger fifo: %q", file)
 	}
 
-	lf := &logPair{l, f, sl, logCtx}
+	lf := &logPair{true, sync.RWMutex{}, l, f, sl, logCtx}
 	d.logs.Store(file, lf)
 	d.idx.Store(logCtx.ContainerID, lf)
-	go consumeLog(lf)
+	go d.consumeLog(file, lf)
 	return nil
 }
 
 func (d *Driver) StopLogging(file string) error {
 	logrus.WithField("file", file).Debugf("Stop logging")
+
 	if lf, ok := d.logs.Load(file); ok {
 		if err := lf.stream.Close(); err != nil {
 			logrus.WithField("file", file).Errorf("Could not stop logging: %s", file)
 			return err
 		}
+
+		lf.closedCond.Lock()
+		lf.isOpen = false
+		if err := lf.fileLog.Close(); err != nil {
+			logrus.WithField("file", file).Errorf("Could not stop file logging: %s", file)
+			return err
+		}
+		if err := lf.aiLog.Close(); err != nil {
+			logrus.WithField("file", file).Errorf("Could not stop AI logging: %s", file)
+			return err
+		}
+
 		d.logs.Delete(file)
+		lf.closedCond.Unlock()
 	}
 	return nil
 }
 
-func consumeLog(lf *logPair) {
+func (d *Driver) consumeLog(file string, lf *logPair) {
 	dec := protoio.NewUint32DelimitedReader(lf.stream, binary.BigEndian, 1e6)
 	defer dec.Close()
 	var buf logdriver.LogEntry
@@ -109,15 +126,29 @@ func consumeLog(lf *logPair) {
 		msg.Partial = buf.Partial
 		msg.Timestamp = time.Unix(0, buf.TimeNano)
 
-		if err := lf.fileLog.Log(&msg); err != nil {
-			logrus.WithField("id", lf.info.ContainerID).WithError(err).WithField("message", msg).Error("error writing log message")
-			continue
-		}
+		var smsg logger.Message
+		smsg.Line = buf.Line
+		smsg.Source = buf.Source
+		smsg.Partial = buf.Partial
+		smsg.Timestamp = time.Unix(0, buf.TimeNano)
 
-		if err := lf.aiLog.Log(&msg); err != nil {
-			logrus.WithField("id", lf.info.ContainerID).WithError(err).WithField("message", msg).Error("error writing log message")
-			continue
+		lf.closedCond.RLock()
+		if lf.isOpen {
+			if err := lf.fileLog.Log(&msg); err != nil {
+				logrus.WithField("id", lf.info.ContainerID).WithError(err).WithField("message", msg).Error("error writing log message")
+				continue
+			}
+
+			if err := lf.aiLog.Log(&smsg); err != nil {
+				logrus.WithField("id", lf.info.ContainerID).WithError(err).WithField("message", msg).Error("error writing log message")
+				continue
+			}
+		} else {
+			logrus.WithField("id", lf.info).WithField("file", file).Info("stop consuming log")
+			lf.closedCond.RUnlock()
+			return
 		}
+		lf.closedCond.RUnlock()
 
 		buf.Reset()
 	}
