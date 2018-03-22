@@ -3,12 +3,13 @@ package insights
 import (
 	"sync"
 	"time"
-	ai "github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
+
+	"github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
 )
 
 func (l *insightsLogger) worker() {
 	timer := time.NewTicker(l.postMessagesFrequency)
-	var messages []*ai.Envelope
+	var messages []*contracts.Envelope
 	for {
 		select {
 		case message, open := <-l.stream:

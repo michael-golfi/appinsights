@@ -3,10 +3,11 @@ package insights
 import (
 	"time"
 
-	"github.com/docker/docker/daemon/logger"
-	ai "github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
 	"encoding/json"
 	"log"
+
+	ai "github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
+	"github.com/docker/docker/daemon/logger"
 )
 
 func (l *insightsLogger) createInsightsMessage(msg *logger.Message) *ai.Envelope {
@@ -21,14 +22,15 @@ func (l *insightsLogger) createInsightsMessage(msg *logger.Message) *ai.Envelope
 	}
 
 	return &ai.Envelope{
-		Name: "Microsoft.ApplicationInsights.MessageData",
-		IKey: l.instrumentationKey,
-		Time: time.Now().UTC().Format(time.RFC3339),
-		Data: ai.Data{
+		Name:       "Microsoft.ApplicationInsights.MessageData",
+		IKey:       l.instrumentationKey,
+		SampleRate: 100.0,
+		Time:       time.Now().UTC().Format(time.RFC3339),
+		Data: &ai.Data{
 			Base: ai.Base{
 				BaseType: "MessageData",
 			},
-			BaseData: ai.MessageData{
+			BaseData: &ai.MessageData{
 				Ver:           2,
 				Message:       string(msg.Line),
 				SeverityLevel: ai.Verbose,

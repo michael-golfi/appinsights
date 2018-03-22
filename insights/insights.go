@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
 	"github.com/docker/docker/daemon/logger"
-	ai "github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
 	"github.com/sirupsen/logrus"
 	"gitlab.com/michael.golfi/appinsights/constants"
 )
@@ -26,7 +26,7 @@ type insightsLogger struct {
 	// For synchronization between background worker and logger.
 	// We use channel to send messages to worker go routine.
 	// All other variables for blocking Close call before we flush all messages to HEC
-	stream     chan *ai.Envelope
+	stream     chan *contracts.Envelope
 	lock       sync.RWMutex
 	closed     bool
 	closedCond *sync.Cond
@@ -74,7 +74,7 @@ func New(info logger.Info) (logger.Logger, error) {
 		instrumentationKey:    constants.Token,
 		gzipCompression:       constants.GzipCompression,
 		gzipCompressionLevel:  constants.GzipCompressionLevel,
-		stream:                make(chan *ai.Envelope, constants.StreamChannelSize),
+		stream:                make(chan *contracts.Envelope, constants.StreamChannelSize),
 		postMessagesFrequency: constants.BatchInterval,
 		postMessagesBatchSize: constants.BatchSize,
 		bufferMaximum:         constants.BufferMaximum,

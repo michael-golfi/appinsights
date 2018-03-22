@@ -13,5 +13,6 @@ cp config.json ./plugin/
 docker plugin disable michaelgolfi/appinsights
 docker plugin rm michaelgolfi/appinsights
 docker plugin create michaelgolfi/appinsights ./plugin
+docker plugin enable michaelgolfi/appinsights
 
 rm -rf plugin
