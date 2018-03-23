@@ -1,10 +1,8 @@
 # Microsoft Application Insights Docker Logging Plugin
 
-<p align="center">
   [![pipeline status](https://gitlab.com/michael.golfi/appinsights-backup/badges/master/pipeline.svg)](https://gitlab.com/michael.golfi/appinsights-backup/commits/master)
   [![coverage report](https://gitlab.com/michael.golfi/appinsights-backup/badges/master/coverage.svg)](https://gitlab.com/michael.golfi/appinsights-backup/commits/master)
   [![Go Report Card](https://goreportcard.com/badge/gitlab.com/michael.golfi/appinsights)](https://goreportcard.com/report/gitlab.com/michael.golfi/appinsights)
-</p> 
 
 This project implements a Docker logging driver that will allow Docker to stream logs to local JSON files and Microsoft Application Insights. 
 This log plugin supports the `docker logs` command.
